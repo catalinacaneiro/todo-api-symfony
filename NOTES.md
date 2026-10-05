@@ -68,7 +68,9 @@ Codex also added automated tests, even though they were not explicitly requested
 I manually tested the endpoint with curl and in the browser. It returned HTTP 200 and an empty JSON array ([]), which is expected because no tasks have been created yet.
 
 
-
+## POST /tasks
+Implemented POST /tasks using a Symfony controller, a small input DTO, Symfony Validator and Doctrine. Valid tasks are persisted with persist() and written to the database with flush(). A successful creation returns HTTP 201. Invalid empty or whitespace-only titles return HTTP 422 and are not saved.
+Manually verified that a created task can subsequently be retrieved through GET /tasks.
 
 
 
