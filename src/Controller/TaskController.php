@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Dto\CreateTaskInput;
+use App\Dto\UpdateTaskInput;
 use App\Entity\Task;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -46,6 +47,37 @@ class TaskController extends AbstractController
             'completed' => $task->isCompleted(),
             'createdAt' => $task->getCreatedAt()->format(\DateTimeInterface::ATOM),
         ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/tasks/{id}', name: 'task_update', methods: ['PATCH'], format: 'json')]
+    public function update(
+        int $id,
+        #[MapRequestPayload(acceptFormat: 'json', serializationContext: ['json_decode_associative' => false], validationFailedStatusCode: 400)] UpdateTaskInput $input,
+        EntityManagerInterface $entityManager,
+        ValidatorInterface $validator,
+    ): JsonResponse {
+        $task = $entityManager->getRepository(Task::class)->find($id);
+        if (null === $task) {
+            return $this->json(['error' => 'Task not found.'], 404);
+        }
+
+        $candidate = clone $task;
+        $input->applyTo($candidate);
+        $violations = $validator->validate($candidate);
+        if (count($violations) > 0) {
+            return $this->json(['errors' => array_map(static fn ($violation): string => $violation->getMessage(), iterator_to_array($violations))], 422);
+        }
+
+        $input->applyTo($task);
+        $entityManager->flush();
+
+        return $this->json([
+            'id' => $task->getId(),
+            'title' => $task->getTitle(),
+            'description' => $task->getDescription(),
+            'completed' => $task->isCompleted(),
+            'createdAt' => $task->getCreatedAt()->format(\DateTimeInterface::ATOM),
+        ]);
     }
 
     #[Route('/tasks', name: 'task_index', methods: ['GET'])]

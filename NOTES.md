@@ -72,6 +72,31 @@ I manually tested the endpoint with curl and in the browser. It returned HTTP 20
 Implemented POST /tasks using a Symfony controller, a small input DTO, Symfony Validator and Doctrine. Valid tasks are persisted with persist() and written to the database with flush(). A successful creation returns HTTP 201. Invalid empty or whitespace-only titles return HTTP 422 and are not saved.
 Manually verified that a created task can subsequently be retrieved through GET /tasks.
 
+### PATCH /tasks/{id}
+
+Implemented partial updates for title, description, and completed.
+Omitted fields and createdAt are preserved. Description can be cleared with null.
+
+Manual tests confirmed successful updates (200), invalid empty titles (422),
+empty objects (400), and missing tasks (404).
+A subsequent GET confirmed the saved changes and that the invalid title was not saved.
 
 
+
+
+
+
+
+
+
+
+### Git branch correction
+
+The POST implementation was committed on `feature-get-tasks` but had not been merged into the branch used for PATCH or pushed to the remote.
+
+The existing POST commit was cherry-picked into `feature-patch-task`. Uncommitted PATCH work was preserved using a stash, including untracked files.
+
+Verified that GET, POST, and PATCH are present and that the full test suite and container lint pass.
+
+Removed an accidental `-.` prefix from CreateTaskControllerTest.php that prevented the test file from loading.
 
