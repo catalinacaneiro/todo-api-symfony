@@ -80,6 +80,20 @@ class TaskController extends AbstractController
         ]);
     }
 
+    #[Route('/tasks/{id}', name: 'task_delete', methods: ['DELETE'], format: 'json')]
+    public function delete(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $task = $entityManager->getRepository(Task::class)->find($id);
+        if (null === $task) {
+            return $this->json(['error' => 'Task not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $entityManager->remove($task);
+        $entityManager->flush();
+
+        return new Response(null, Response::HTTP_NO_CONTENT);
+    }
+
     #[Route('/tasks', name: 'task_index', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager): JsonResponse
     {

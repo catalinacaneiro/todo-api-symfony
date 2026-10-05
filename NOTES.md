@@ -81,6 +81,12 @@ Manual tests confirmed successful updates (200), invalid empty titles (422),
 empty objects (400), and missing tasks (404).
 A subsequent GET confirmed the saved changes and that the invalid title was not saved.
 
+### DELETE /tasks/{id}
+
+Implemented deletion using Doctrine remove() and flush().
+Manually verified: deleting an existing task returns 204 with an empty body,
+repeating the deletion returns 404 with JSON, and GET confirms the task is gone.
+
 
 
 
